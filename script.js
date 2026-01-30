@@ -205,6 +205,7 @@ function attachListeners() {
         renderItems();
         calculateTotals();
         saveToLocalStorage();
+        showToast('Item added successfully');
     };
 
     printBtn.onclick = () => window.print();
@@ -291,7 +292,7 @@ function attachListeners() {
         history.unshift(invoiceData);
         localStorage.setItem('invoicely_history', JSON.stringify(history.slice(0, 10))); // Keep last 10
         renderHistory();
-        alert('Invoice saved to history!');
+        showToast('Invoice saved to history!');
     };
 
     function renderHistory() {
@@ -420,6 +421,7 @@ function removeItem(id) {
     items = items.filter(i => i.id !== id);
     renderItems(); // Re-render editor list because a row was removed
     saveToLocalStorage();
+    showToast('Item removed', 'trash-2');
 }
 
 function calculateTotals() {
@@ -538,6 +540,21 @@ installBtn.onclick = async () => {
         deferredPrompt = null;
     }
 };
+
+function showToast(message, icon = 'check-circle') {
+    const toast = document.getElementById('toast');
+    const msgEl = document.getElementById('toastMessage');
+    const iconEl = toast.querySelector('i');
+
+    msgEl.innerText = message;
+    iconEl.setAttribute('data-lucide', icon);
+    lucide.createIcons();
+
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
 
 // Start
 init();
