@@ -41,7 +41,7 @@ This is a static web application, meaning it doesn't need a backend server. You 
 ### Option 3: GitHub Pages
 1. Go to your repository **Settings** -> **Pages**.
 2. Select the branch (usually `main`) and the path (`/root`).
-3. Click Save. Your site will be live at `https://<username>.github.io/<repo-name>/`.
+3. Click Save. Your site will be live at `https://<waseem96525>.github.io/<INVOICE-MAKER>/`.
 
 ## 📂 Project Structure
 
