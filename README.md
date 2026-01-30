@@ -11,10 +11,16 @@ Invoicely is a professional, lightweight, and secure Progressive Web App (PWA) d
 - **Tax Systems**: Supports both simple tax and GST (CGST/SGST/IGST).
 - **Payment Integration**: Generate UPI QR codes automatically based on your total amount.
 - **PWA Ready**: Install it on your phone or desktop for offline use.
-- **Local Storage**: Your drafts are automatically saved to your browser's local storage.
-- **Flexible Export**: Download as PDF, Print directly, or export data to CSV.
+- **PRO Version**: Activate with a product key to remove watermarks and unlock pro status.
+- **Local Storage**: Your drafts and license status are automatically saved to your browser's local storage.
+- **Flexible Export**: Download as PDF (No watermark in PRO), Print directly, or export data to CSV.
 - **Dark Mode**: Beautiful, easy-on-the-eyes interface for late-night billing.
 - **History Management**: Revisit and re-edit your last 10 saved invoices.
+
+## 🔑 Pro Activation (Demo)
+
+The app includes a license validation system. For demonstration purposes, you can use the following key format:
+`INV-PRO-XXXX-2026` (Replace `XXXX` with any 4 alphanumeric characters, e.g., `INV-PRO-FREE-2026`).
 
 ## 🛠️ Technology Stack
 

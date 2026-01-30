@@ -196,6 +196,26 @@ textarea:focus {
     background: #fecaca;
 }
 
+.badge {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-free {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.badge-pro {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
 /* Item List */
 /* Item list row decoration */
 .item-row {
@@ -353,6 +373,15 @@ textarea:focus {
     @page {
         margin: 0;
         size: auto;
+    }
+
+    #freeWatermark {
+        display: block !important;
+        opacity: 0.05 !important;
+    }
+
+    body.pro-version #freeWatermark {
+        display: none !important;
     }
 }
 

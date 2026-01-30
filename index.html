@@ -232,10 +232,37 @@
                     </div>
                 </div>
             </div>
+
+            <div class="section-card" id="licenseSection">
+                <div class="section-title">
+                    <i data-lucide="shield-check"></i> Software License
+                </div>
+                <div id="licenseStatus" style="margin-bottom: 1rem; font-size: 0.85rem;">
+                    <span class="badge badge-free">Free Version</span>
+                </div>
+                <div id="licenseInputGroup">
+                    <div class="form-group">
+                        <label>Product Key</label>
+                        <input type="text" id="productKey" placeholder="INV-PRO-XXXX-XXXX-XXXX">
+                    </div>
+                    <button class="btn btn-primary" id="activateBtn" style="width: 100%;">
+                        <i data-lucide="zap"></i> Activate Pro
+                    </button>
+                </div>
+                <div id="licenseInfo"
+                    style="display: none; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid #10b981;">
+                    <p style="color: #059669; font-weight: 600; font-size: 0.85rem; margin: 0;">Pro Version Active</p>
+                    <p id="licenseKeyDisplay" style="font-size: 0.7rem; color: #059669; opacity: 0.8; margin-top: 2px;">
+                    </p>
+                </div>
+            </div>
         </aside>
 
         <!-- Preview Area -->
         <main class="preview-pane">
+            <div id="freeWatermark"
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; z-index: 10; white-space: nowrap; display: block;">
+                INVOICELY FREE</div>
             <div class="preview-actions">
                 <button class="btn btn-outline" id="toggleModeBtn">
                     <i data-lucide="layout"></i> Compact Mode: <span id="modeStatus">OFF</span>

@@ -63,6 +63,7 @@ function saveToLocalStorage() {
     });
     data.inputs.taxSystem = document.getElementById('taxSystem').value;
     data.darkMode = document.body.classList.contains('dark-mode');
+    data.licenseKey = localStorage.getItem('invoicely_license');
     localStorage.setItem('invoicely_draft', JSON.stringify(data));
 }
 
@@ -158,6 +159,11 @@ function attachListeners() {
     document.getElementById('currency').onchange = () => {
         calculateTotals();
         renderItems();
+    };
+
+    document.getElementById('activateBtn').onclick = () => {
+        const key = document.getElementById('productKey').value.trim().toUpperCase();
+        activateLicense(key);
     };
 
     // Branding Listeners
@@ -544,17 +550,64 @@ installBtn.onclick = async () => {
 function showToast(message, icon = 'check-circle') {
     const toast = document.getElementById('toast');
     const msgEl = document.getElementById('toastMessage');
-    const iconEl = toast.querySelector('i');
+    const iconEl = toast.querySelector('i, svg');
 
-    msgEl.innerText = message;
-    iconEl.setAttribute('data-lucide', icon);
+    if (msgEl) msgEl.innerText = message;
+    if (iconEl) {
+        iconEl.setAttribute('data-lucide', icon);
+        // If it's already an SVG, we need to clear it and let Lucide recreate it
+        if (iconEl.tagName.toLowerCase() === 'svg') {
+            const newIcon = document.createElement('i');
+            newIcon.setAttribute('data-lucide', icon);
+            iconEl.parentNode.replaceChild(newIcon, iconEl);
+        }
+    }
+
     lucide.createIcons();
-
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
 }
 
+function activateLicense(key) {
+    if (validateKey(key)) {
+        localStorage.setItem('invoicely_license', key);
+        applyProStatus(key);
+        showToast('Pro Version Activated! 🚀');
+    } else {
+        showToast('Invalid Product Key', 'alert-circle');
+    }
+}
+
+function validateKey(key) {
+    // New Format: INV-PRO-XXXX-XXXX-XXXX
+    const regex = /^INV-PRO-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+    return regex.test(key);
+}
+
+function applyProStatus(key) {
+    const isPro = !!key;
+    if (isPro) {
+        document.body.classList.add('pro-version');
+        document.getElementById('licenseStatus').innerHTML = '<span class="badge badge-pro">Pro Version</span>';
+        document.getElementById('licenseInputGroup').style.display = 'none';
+        document.getElementById('licenseInfo').style.display = 'block';
+        document.getElementById('licenseKeyDisplay').innerText = `Key: ${key}`;
+        document.getElementById('freeWatermark').style.display = 'none';
+
+        // Remove "Premium" wording from title if it was "Free"
+        document.title = "Invoicely Pro | Premium Invoice Maker";
+    }
+}
+
+function checkLicense() {
+    const savedKey = localStorage.getItem('invoicely_license');
+    if (savedKey && validateKey(savedKey)) {
+        applyProStatus(savedKey);
+    }
+}
+
 // Start
 init();
+checkLicense();
