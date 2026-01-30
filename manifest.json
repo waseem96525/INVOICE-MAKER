@@ -1,0 +1,17 @@
+{
+    "name": "Invoicely Premium Invoice Maker",
+    "short_name": "Invoicely",
+    "description": "Premium Invoice & Receipt Maker for professional businesses.",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#6366f1",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2910/2910791.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

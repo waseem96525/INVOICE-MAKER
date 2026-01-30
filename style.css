@@ -38,6 +38,7 @@ body {
     margin: 0 auto;
     padding: 2rem;
     gap: 2rem;
+    transition: padding 0.3s ease;
 }
 
 .editor-pane {
@@ -349,22 +350,67 @@ textarea:focus {
 @media (max-width: 1200px) {
     .app-container {
         flex-direction: column;
+        padding: 1rem;
     }
 
     .editor-pane {
         max-width: 100%;
         height: auto;
+        position: static;
+        padding: 1rem;
     }
 
     .preview-pane {
         position: static;
         height: auto;
-        transform: scale(0.9);
+        padding: 0;
     }
 
     .invoice-sheet {
-        transform: scale(0.9);
+        transform: scale(calc(100vw / 230mm)) !important;
+        /* Dynamic scaling based on viewport */
+        transform-origin: top center;
         margin-bottom: 2rem;
+        box-shadow: none;
+        border: 1px solid var(--border);
+    }
+
+    .invoice-sheet.compact {
+        transform: scale(1) !important;
+        width: 100%;
+        max-width: 80mm;
+    }
+}
+
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .item-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .item-row input:first-child {
+        grid-column: span 2;
+    }
+
+    .app-container {
+        padding: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .preview-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .preview-actions .btn {
+        width: 100%;
     }
 }
 

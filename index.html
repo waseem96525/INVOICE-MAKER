@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoicely | Premium Invoice Maker</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6366f1">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -21,6 +23,10 @@
                     <h1 style="margin-bottom: 0; font-size: 1.5rem;">Invoicely</h1>
                     <p style="font-size: 0.8rem; color: var(--text-muted);">Premium Invoice Designer</p>
                 </div>
+                <button id="installBtn" class="btn btn-primary"
+                    style="margin-left: auto; display: none; padding: 0.5rem 1rem; font-size: 0.8rem;">
+                    <i data-lucide="download"></i> Install
+                </button>
             </header>
 
             <div class="section-card">
