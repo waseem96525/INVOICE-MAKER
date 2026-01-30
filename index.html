@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicely | Premium Invoice Maker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Editor Sidebar -->
+        <aside class="editor-pane">
+            <header style="margin-bottom: 2.5rem; display: flex; align-items: center; gap: 12px;">
+                <div style="background: var(--primary); color: white; padding: 10px; border-radius: 12px;">
+                    <i data-lucide="file-text" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div>
+                    <h1 style="margin-bottom: 0; font-size: 1.5rem;">Invoicely</h1>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Premium Invoice Designer</p>
+                </div>
+            </header>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <i data-lucide="user"></i> Sender Info
+                </div>
+                <div class="form-group">
+                    <label>Business Name</label>
+                    <input type="text" id="senderName" placeholder="Your Company" value="Acme Corp">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="senderEmail" placeholder="email@company.com" value="hello@acme.com">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="senderAddress" rows="2"
+                        placeholder="Street, City, Zip">123 Innovation Way, Tech City, CA 94043</textarea>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <i data-lucide="users"></i> Bill To
+                </div>
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="clientName" placeholder="Client Name" value="Design Studio">
+                </div>
+                <div class="form-group">
+                    <label>Client Email</label>
+                    <input type="email" id="clientEmail" placeholder="client@email.com" value="billing@design.co">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="clientAddress" rows="2"
+                        placeholder="Street, City, Zip">456 Creative St, Artsy District, NY 10001</textarea>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <i data-lucide="file-text"></i> Invoice Details
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Invoice #</label>
+                        <input type="text" id="invoiceNumber" value="INV-2024-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <select id="currency">
+                            <option value="$">USD ($)</option>
+                            <option value="₹">INR (₹)</option>
+                            <option value="€">EUR (€)</option>
+                            <option value="£">GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="invoiceDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="dueDate">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <i data-lucide="list"></i> Items
+                </div>
+                <div id="itemList">
+                    <!-- Items will be injected here -->
+                </div>
+                <button class="btn btn-outline" id="addItemBtn" style="width: 100%; margin-top: 1rem;">
+                    <i data-lucide="plus"></i> Add Item
+                </button>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <i data-lucide="settings"></i> Taxes & Discounts
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tax (%)</label>
+                        <input type="number" id="taxRate" value="10" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Discount (%)</label>
+                        <input type="number" id="discountRate" value="0" step="0.1">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Preview Area -->
+        <main class="preview-pane">
+            <div class="preview-actions">
+                <button class="btn btn-outline" id="toggleModeBtn">
+                    <i data-lucide="layout"></i> Compact Mode: <span id="modeStatus">OFF</span>
+                </button>
+                <button class="btn btn-primary" id="printBtn">
+                    <i data-lucide="printer"></i> Print / Save PDF
+                </button>
+                <button class="btn btn-outline" id="resetBtn">
+                    <i data-lucide="rotate-ccw"></i> Reset
+                </button>
+            </div>
+
+            <div class="invoice-sheet" id="invoiceSheet">
+                <!-- Live Preview Content -->
+                <div class="header-flex" style="display: flex; justify-content: space-between; margin-bottom: 60px;">
+                    <div>
+                        <h2 id="prev-senderName" style="font-size: 2rem; color: var(--primary); margin-bottom: 8px;">
+                            Acme Corp</h2>
+                        <p id="prev-senderAddress" style="color: var(--text-muted); line-height: 1.5;">123 Innovation
+                            Way<br>Tech City, CA 94043</p>
+                        <p id="prev-senderEmail" style="color: var(--text-muted);">hello@acme.com</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h1 style="font-size: 3rem; margin-bottom: 10px; color: #e2e8f0;">INVOICE</h1>
+                        <p style="font-weight: 600;"># <span id="prev-invoiceNumber">INV-2024-001</span></p>
+                        <p style="color: var(--text-muted);">Date: <span id="prev-invoiceDate">2024-01-30</span></p>
+                    </div>
+                </div>
+
+                <div class="info-grid"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 60px;">
+                    <div>
+                        <p
+                            style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; margin-bottom: 15px;">
+                            Bill To</p>
+                        <h3 id="prev-clientName" style="font-size: 1.25rem; margin-bottom: 5px;">Design Studio</h3>
+                        <p id="prev-clientAddress" style="color: var(--text-muted); line-height: 1.5;">456 Creative
+                            St<br>Artsy District, NY 10001</p>
+                        <p id="prev-clientEmail" style="color: var(--text-muted);">billing@design.co</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p
+                            style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; margin-bottom: 15px;">
+                            Due Date</p>
+                        <h3 id="prev-dueDate" style="font-size: 1.25rem; color: #ef4444;">2024-02-15</h3>
+                    </div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                            <th style="padding: 15px 0; color: var(--text-muted);">Description</th>
+                            <th style="padding: 15px 0; text-align: center; color: var(--text-muted);">Qty</th>
+                            <th style="padding: 15px 0; text-align: right; color: var(--text-muted);">Price</th>
+                            <th style="padding: 15px 0; text-align: right; color: var(--text-muted);">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prev-items">
+                        <!-- Preview items will be injected here -->
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end;">
+                    <div class="totals-container" style="width: 300px;">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span style="color: var(--text-muted);">Subtotal</span>
+                            <span id="prev-subtotal" style="font-weight: 600;">$0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span style="color: var(--text-muted);">Tax (<span
+                                    id="prev-taxRateDisplay">10</span>%)</span>
+                            <span id="prev-taxAmount" style="font-weight: 600;">$0.00</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px;">
+                            <span style="color: var(--text-muted);">Discount (<span
+                                    id="prev-discountRateDisplay">0</span>%)</span>
+                            <span id="prev-discountAmount" style="font-weight: 600; color: #10b981;">-$0.00</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; padding: 15px 0; background: #f8fafc; border-radius: 8px; padding: 15px;">
+                            <span style="font-weight: 700; font-size: 1.25rem;">Total</span>
+                            <span id="prev-total"
+                                style="font-weight: 700; font-size: 1.25rem; color: var(--primary);">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border);">
+                    <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+                        <strong>Notes:</strong><br>
+                        Please pay within 15 days. Make all checks payable to <span id="prev-notes-name">Acme
+                            Corp</span>.
+                        Thank you for your business!
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

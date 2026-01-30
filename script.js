@@ -1,0 +1,187 @@
+// State
+let items = [
+    { id: 1, description: 'Website Design', quantity: 1, price: 1500 },
+    { id: 2, description: 'Brand Identity', quantity: 1, price: 800 }
+];
+
+// Selectors
+const itemList = document.getElementById('itemList');
+const prevItems = document.getElementById('prev-items');
+const addItemBtn = document.getElementById('addItemBtn');
+const printBtn = document.getElementById('printBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+// Inputs maps
+const inputMap = {
+    'senderName': 'prev-senderName',
+    'senderEmail': 'prev-senderEmail',
+    'senderAddress': 'prev-senderAddress',
+    'clientName': 'prev-clientName',
+    'clientEmail': 'prev-clientEmail',
+    'clientAddress': 'prev-clientAddress',
+    'invoiceNumber': 'prev-invoiceNumber',
+    'invoiceDate': 'prev-invoiceDate',
+    'dueDate': 'prev-dueDate',
+    'taxRate': 'prev-taxRateDisplay',
+    'discountRate': 'prev-discountRateDisplay'
+};
+
+// Initialization
+function init() {
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const dueDate = nextMonth.toISOString().split('T')[0];
+
+    document.getElementById('invoiceDate').value = today;
+    document.getElementById('dueDate').value = dueDate;
+
+    renderItems();
+    attachListeners();
+    updateAllPreviews();
+}
+
+function attachListeners() {
+    // Dynamic text inputs
+    Object.keys(inputMap).forEach(id => {
+        document.getElementById(id).oninput = (e) => {
+            const val = e.target.value;
+            document.getElementById(inputMap[id]).innerText = val;
+            if (id === 'taxRate' || id === 'discountRate' || id === 'senderName') {
+                if (id === 'senderName') document.getElementById('prev-notes-name').innerText = val;
+                calculateTotals();
+            }
+        };
+    });
+
+    document.getElementById('currency').onchange = () => {
+        calculateTotals();
+        renderItems();
+    };
+
+    addItemBtn.onclick = () => {
+        const newItem = {
+            id: Date.now(),
+            description: '',
+            quantity: 1,
+            price: 0
+        };
+        items.push(newItem);
+        renderItems();
+        calculateTotals();
+    };
+
+    printBtn.onclick = () => window.print();
+
+    const toggleModeBtn = document.getElementById('toggleModeBtn');
+    const invoiceSheet = document.getElementById('invoiceSheet');
+    const modeStatus = document.getElementById('modeStatus');
+
+    toggleModeBtn.onclick = () => {
+        const isCompact = invoiceSheet.classList.toggle('compact');
+        modeStatus.innerText = isCompact ? 'ON' : 'OFF';
+        toggleModeBtn.classList.toggle('btn-primary');
+        toggleModeBtn.classList.toggle('btn-outline');
+    };
+
+    resetBtn.onclick = () => {
+        if (confirm('Are you sure you want to reset everything?')) {
+            location.reload();
+        }
+    };
+}
+
+function renderItems() {
+    itemList.innerHTML = '';
+
+    items.forEach((item, index) => {
+        // Editor Row
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Description" value="${item.description}" 
+                oninput="updateItem(${item.id}, 'description', this.value)">
+            <input type="number" placeholder="Qty" value="${item.quantity}" 
+                oninput="updateItem(${item.id}, 'quantity', this.value)">
+            <input type="number" placeholder="Price" value="${item.price}" 
+                oninput="updateItem(${item.id}, 'price', this.value)">
+            <button class="btn btn-danger" onclick="removeItem(${item.id})">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+            </button>
+        `;
+        itemList.appendChild(row);
+    });
+
+    lucide.createIcons();
+    renderPreviewItems();
+    calculateTotals();
+}
+
+function updateItem(id, field, value) {
+    const item = items.find(i => i.id === id);
+    if (item) {
+        if (field === 'quantity' || field === 'price') {
+            item[field] = parseFloat(value) || 0;
+        } else {
+            item[field] = value;
+        }
+    }
+    // Update live preview only, don't re-render editor list to keep focus
+    calculateTotals();
+    renderPreviewItems();
+}
+
+function renderPreviewItems() {
+    prevItems.innerHTML = '';
+    const currency = document.getElementById('currency').value;
+
+    items.forEach(item => {
+        const prevRow = document.createElement('tr');
+        prevRow.style.borderBottom = '1px solid #f1f5f9';
+        prevRow.innerHTML = `
+            <td style="padding: 15px 0;">${item.description || 'New Item'}</td>
+            <td style="padding: 15px 0; text-align: center;">${item.quantity}</td>
+            <td style="padding: 15px 0; text-align: right;">${currency}${item.price.toLocaleString()}</td>
+            <td style="padding: 15px 0; text-align: right; font-weight: 600;">${currency}${(item.quantity * item.price).toLocaleString()}</td>
+        `;
+        prevItems.appendChild(prevRow);
+    });
+}
+
+function removeItem(id) {
+    items = items.filter(i => i.id !== id);
+    renderItems(); // Re-render editor list because a row was removed
+}
+
+function calculateTotals() {
+    const currency = document.getElementById('currency').value;
+    const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    const discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
+
+    let subtotal = 0;
+    items.forEach(item => {
+        subtotal += item.quantity * item.price;
+    });
+
+    const taxAmount = subtotal * (taxRate / 100);
+    const discountAmount = subtotal * (discountRate / 100);
+    const total = subtotal + taxAmount - discountAmount;
+
+    document.getElementById('prev-subtotal').innerText = `${currency}${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    document.getElementById('prev-taxAmount').innerText = `${currency}${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    document.getElementById('prev-discountAmount').innerText = `-${currency}${discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    document.getElementById('prev-total').innerText = `${currency}${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+}
+
+function updateAllPreviews() {
+    Object.keys(inputMap).forEach(id => {
+        const input = document.getElementById(id);
+        const prev = document.getElementById(inputMap[id]);
+        if (input && prev) prev.innerText = input.value;
+    });
+    document.getElementById('prev-notes-name').innerText = document.getElementById('senderName').value;
+}
+
+// Start
+init();
