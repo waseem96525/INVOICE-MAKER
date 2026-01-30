@@ -16,9 +16,11 @@ const inputMap = {
     'senderName': 'prev-senderName',
     'senderEmail': 'prev-senderEmail',
     'senderAddress': 'prev-senderAddress',
+    'senderGst': 'prev-senderGst',
     'clientName': 'prev-clientName',
     'clientEmail': 'prev-clientEmail',
     'clientAddress': 'prev-clientAddress',
+    'clientGst': 'prev-clientGst',
     'invoiceNumber': 'prev-invoiceNumber',
     'invoiceDate': 'prev-invoiceDate',
     'dueDate': 'prev-dueDate',
@@ -45,15 +47,55 @@ function init() {
 function attachListeners() {
     // Dynamic text inputs
     Object.keys(inputMap).forEach(id => {
-        document.getElementById(id).oninput = (e) => {
-            const val = e.target.value;
-            document.getElementById(inputMap[id]).innerText = val;
-            if (id === 'taxRate' || id === 'discountRate' || id === 'senderName') {
-                if (id === 'senderName') document.getElementById('prev-notes-name').innerText = val;
-                calculateTotals();
-            }
-        };
+        const inputEl = document.getElementById(id);
+        if (inputEl) {
+            inputEl.oninput = (e) => {
+                const val = e.target.value;
+                const prevEl = document.getElementById(inputMap[id]);
+                if (prevEl) prevEl.innerText = val;
+
+                // Toggle GSTIN visibility in preview if typing
+                if ((id === 'senderGst' || id === 'clientGst') && val) {
+                    document.getElementById(`prev-${id}Display`).style.display = 'block';
+                } else if ((id === 'senderGst' || id === 'clientGst') && !val) {
+                    document.getElementById(`prev-${id}Display`).style.display = 'none';
+                }
+
+                if (id === 'taxRate' || id === 'discountRate' || id === 'senderName') {
+                    if (id === 'senderName') {
+                        const notesName = document.getElementById('prev-notes-name');
+                        if (notesName) notesName.innerText = val;
+                    }
+                    calculateTotals();
+                }
+            };
+        }
     });
+
+    document.getElementById('taxSystem').onchange = (e) => {
+        const system = e.target.value;
+        const gstFields = document.getElementById('gstFields');
+        const simpleTaxRow = document.getElementById('simpleTaxRow');
+        const gstTaxRows = document.getElementById('gstTaxRows');
+        const taxRateLabel = document.querySelector('label[for="taxRate"]') || document.querySelector('.form-group label:contains("Tax")');
+
+        if (system === 'gst') {
+            gstFields.style.display = 'block';
+            simpleTaxRow.style.display = 'none';
+            gstTaxRows.style.display = 'block';
+            // Also update input label for clarity
+            document.querySelector('#taxRate').previousElementSibling.innerText = 'GST Rate (%)';
+        } else {
+            gstFields.style.display = 'none';
+            simpleTaxRow.style.display = 'flex';
+            gstTaxRows.style.display = 'none';
+            document.querySelector('#taxRate').previousElementSibling.innerText = 'Tax (%)';
+            // Hide preview GSTINs
+            document.getElementById('prev-senderGstDisplay').style.display = 'none';
+            document.getElementById('prev-clientGstDisplay').style.display = 'none';
+        }
+        calculateTotals();
+    };
 
     document.getElementById('currency').onchange = () => {
         calculateTotals();
@@ -158,18 +200,33 @@ function calculateTotals() {
     const currency = document.getElementById('currency').value;
     const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
     const discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
+    const taxSystem = document.getElementById('taxSystem').value;
 
     let subtotal = 0;
     items.forEach(item => {
         subtotal += item.quantity * item.price;
     });
 
-    const taxAmount = subtotal * (taxRate / 100);
+    let taxAmount = 0;
+    if (taxSystem === 'gst') {
+        const gstHalf = taxRate / 2;
+        const cgstAmount = subtotal * (gstHalf / 100);
+        const sgstAmount = subtotal * (gstHalf / 100);
+        taxAmount = cgstAmount + sgstAmount;
+
+        document.getElementById('prev-cgstRate').innerText = gstHalf.toFixed(1);
+        document.getElementById('prev-sgstRate').innerText = gstHalf.toFixed(1);
+        document.getElementById('prev-cgstAmount').innerText = `${currency}${cgstAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        document.getElementById('prev-sgstAmount').innerText = `${currency}${sgstAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    } else {
+        taxAmount = subtotal * (taxRate / 100);
+        document.getElementById('prev-taxAmount').innerText = `${currency}${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+    }
+
     const discountAmount = subtotal * (discountRate / 100);
     const total = subtotal + taxAmount - discountAmount;
 
     document.getElementById('prev-subtotal').innerText = `${currency}${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-    document.getElementById('prev-taxAmount').innerText = `${currency}${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
     document.getElementById('prev-discountAmount').innerText = `-${currency}${discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
     document.getElementById('prev-total').innerText = `${currency}${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 }
@@ -180,7 +237,8 @@ function updateAllPreviews() {
         const prev = document.getElementById(inputMap[id]);
         if (input && prev) prev.innerText = input.value;
     });
-    document.getElementById('prev-notes-name').innerText = document.getElementById('senderName').value;
+    const notesName = document.getElementById('prev-notes-name');
+    if (notesName) notesName.innerText = document.getElementById('senderName').value;
 }
 
 // Service Worker Registration

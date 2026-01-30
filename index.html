@@ -71,6 +71,25 @@
                 <div class="section-title">
                     <i data-lucide="file-text"></i> Invoice Details
                 </div>
+                <div class="form-group">
+                    <label>Tax System</label>
+                    <select id="taxSystem">
+                        <option value="none">Non-GST (Simple Tax)</option>
+                        <option value="gst">GST (CGST/SGST)</option>
+                    </select>
+                </div>
+                <div id="gstFields" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sender GSTIN</label>
+                            <input type="text" id="senderGst" placeholder="27AAAAA0000A1Z5">
+                        </div>
+                        <div class="form-group">
+                            <label>Client GSTIN</label>
+                            <input type="text" id="clientGst" placeholder="Client GSTIN">
+                        </div>
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Invoice #</label>
@@ -79,8 +98,8 @@
                     <div class="form-group">
                         <label>Currency</label>
                         <select id="currency">
-                            <option value="$">USD ($)</option>
                             <option value="₹">INR (₹)</option>
+                            <option value="$">USD ($)</option>
                             <option value="€">EUR (€)</option>
                             <option value="£">GBP (£)</option>
                         </select>
@@ -150,6 +169,9 @@
                         <p id="prev-senderAddress" style="color: var(--text-muted); line-height: 1.5;">123 Innovation
                             Way<br>Tech City, CA 94043</p>
                         <p id="prev-senderEmail" style="color: var(--text-muted);">hello@acme.com</p>
+                        <p id="prev-senderGstDisplay"
+                            style="font-size: 0.8rem; font-weight: 600; margin-top: 5px; display: none;">GSTIN: <span
+                                id="prev-senderGst"></span></p>
                     </div>
                     <div style="text-align: right;">
                         <h1 style="font-size: 3rem; margin-bottom: 10px; color: #e2e8f0;">INVOICE</h1>
@@ -168,6 +190,9 @@
                         <p id="prev-clientAddress" style="color: var(--text-muted); line-height: 1.5;">456 Creative
                             St<br>Artsy District, NY 10001</p>
                         <p id="prev-clientEmail" style="color: var(--text-muted);">billing@design.co</p>
+                        <p id="prev-clientGstDisplay"
+                            style="font-size: 0.8rem; font-weight: 600; margin-top: 5px; display: none;">GSTIN: <span
+                                id="prev-clientGst"></span></p>
                     </div>
                     <div style="text-align: right;">
                         <p
@@ -197,10 +222,20 @@
                             <span style="color: var(--text-muted);">Subtotal</span>
                             <span id="prev-subtotal" style="font-weight: 600;">$0.00</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                        <div id="simpleTaxRow" style="display: flex; justify-content: space-between; padding: 8px 0;">
                             <span style="color: var(--text-muted);">Tax (<span
                                     id="prev-taxRateDisplay">10</span>%)</span>
                             <span id="prev-taxAmount" style="font-weight: 600;">$0.00</span>
+                        </div>
+                        <div id="gstTaxRows" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span style="color: var(--text-muted);">CGST (<span id="prev-cgstRate"></span>%)</span>
+                                <span id="prev-cgstAmount" style="font-weight: 600;">$0.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                <span style="color: var(--text-muted);">SGST (<span id="prev-sgstRate"></span>%)</span>
+                                <span id="prev-sgstAmount" style="font-weight: 600;">$0.00</span>
+                            </div>
                         </div>
                         <div
                             style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px;">
